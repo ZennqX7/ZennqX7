@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&height=230&color=0:000000,100:2b2b2b&text=Zennq&fontColor=ffffff&fontSize=72&fontAlignY=38&desc=Discord%20bot%20developer%20%26%20web%20tinkerer&descAlignY=60&descSize=18" alt="Zennq" width="100%" />
+<img src="https://capsule-render.vercel.app/api?type=waving&height=230&color=0:000000,100:2b2b2b&text=Zennq&fontColor=ffffff&fontSize=72&fontAlignY=38&desc=Discord%20bot%20developer%20and%20web%20tinkerer&descAlignY=60&descSize=18" alt="Zennq" width="100%" />
 
 <a href="https://zennq.my.id">
   <img src="https://readme-typing-svg.demolab.com?font=Poppins&weight=600&size=22&duration=3200&pause=900&color=FFFFFF&center=true&vCenter=true&width=520&height=40&lines=Discord+bot+developer;Web+tinkerer;Deep+into+manhwa;Building+things+at+zennq.my.id" alt="Typing intro" />
@@ -20,10 +20,12 @@
 
 ```text
 > whoami
-a guy who builds bots and reads manhwa
+a guy who builds bots
+and reads manhwa
 
 > what-i-do
-Discord bots, websites, and random web tinkering
+Discord bots, websites,
+and random web tinkering
 
 > stack
 JavaScript · HTML · CSS
@@ -55,7 +57,6 @@ too much manhwa
 ### Stats
 
 <div align="center">
-  <img height="170" src="https://github-readme-stats.vercel.app/api?username=ZennqX7&show_icons=true&hide_border=false&bg_color=000000&title_color=ffffff&text_color=a3a3a3&icon_color=ffffff&border_color=262626&include_all_commits=true" alt="GitHub stats" />
   <img height="170" src="https://streak-stats.demolab.com?user=ZennqX7&background=000000&border=262626&stroke=262626&ring=ffffff&fire=ffffff&currStreakNum=ffffff&currStreakLabel=ffffff&sideNums=ffffff&sideLabels=a3a3a3&dates=737373" alt="Contribution streak" />
 </div>
 
