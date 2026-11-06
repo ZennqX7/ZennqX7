@@ -1,0 +1,86 @@
+name: Contribution Wave
+
+on:
+  schedule:
+    - cron: "0 */12 * * *"
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Generate contribution wave
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LOGIN: ${{ github.repository_owner }}
+        run: |
+          mkdir -p dist
+          node - <<'EOF'
+          const fs = require("fs");
+          const query = `query($login:String!){user(login:$login){contributionsCollection{contributionCalendar{totalContributions weeks{contributionDays{contributionCount weekday}}}}}}`;
+
+          (async () => {
+            const res = await fetch("https://api.github.com/graphql", {
+              method: "POST",
+              headers: {
+                Authorization: "Bearer " + process.env.GH_TOKEN,
+                "Content-Type": "application/json",
+                "User-Agent": "contrib-wave",
+              },
+              body: JSON.stringify({ query, variables: { login: process.env.LOGIN } }),
+            });
+            const json = await res.json();
+            if (!res.ok || json.errors || !json.data || !json.data.user) {
+              console.error(JSON.stringify(json).slice(0, 500));
+              process.exit(1);
+            }
+            const cal = json.data.user.contributionsCollection.contributionCalendar;
+            const weeks = cal.weeks;
+
+            const cell = 12, gap = 4, pad = 16, pitch = cell + gap;
+            const W = pad * 2 + weeks.length * pitch - gap;
+            const H = pad * 2 + 7 * pitch - gap;
+
+            const nz = [];
+            weeks.forEach((w) => w.contributionDays.forEach((d) => { if (d.contributionCount > 0) nz.push(d.contributionCount); }));
+            nz.sort((a, b) => a - b);
+            const q = (p) => (nz.length ? nz[Math.min(nz.length - 1, Math.floor(p * nz.length))] : 0);
+            const t1 = q(0.25), t2 = q(0.5), t3 = q(0.75);
+            const level = (c) => (c === 0 ? 0 : c <= t1 ? 1 : c <= t2 ? 2 : c <= t3 ? 3 : 4);
+            const base = [0.07, 0.25, 0.45, 0.68, 0.9];
+
+            const build = (color) => {
+              let out = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Contribution wave">`;
+              weeks.forEach((w, ci) => {
+                w.contributionDays.forEach((d) => {
+                  const b = base[level(d.contributionCount)];
+                  const peak = b >= 0.9 ? 1 : Math.min(1, +(b + 0.5).toFixed(2));
+                  const x = pad + ci * pitch;
+                  const y = pad + d.weekday * pitch;
+                  const begin = (ci * 0.055 + d.weekday * 0.015).toFixed(3);
+                  out += `<rect x="${x}" y="${y}" width="${cell}" height="${cell}" rx="3" fill="${color}" fill-opacity="${b}"><animate attributeName="fill-opacity" values="${b};${peak};${b};${b}" keyTimes="0;0.06;0.2;1" dur="5s" begin="${begin}s" repeatCount="indefinite"/></rect>`;
+                });
+              });
+              return out + "</svg>";
+            };
+
+            fs.writeFileSync("dist/contrib-dark.svg", build("#ffffff"));
+            fs.writeFileSync("dist/contrib-light.svg", build("#0b0b0b"));
+            console.log("total contributions:", cal.totalContributions, "| weeks:", weeks.length);
+          })();
+          EOF
+
+      - name: Publish to output branch
+        uses: crazy-max/ghaction-github-pages@v3.1.0
+        with:
+          target_branch: output
+          build_dir: dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
